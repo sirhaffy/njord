@@ -24,7 +24,9 @@ export default function Home( {posts} ) {
             posts.nodes.map( post => {
               return (
                 <ul key="{post.slug}">
-                  <Link href={`/posts/${post.slug}`}>{post.title}</Link>
+                  <li>
+                    <Link href={`/posts/${post.slug}`}>{post.title}</Link>
+                  </li>
                 </ul>
               )
             })
