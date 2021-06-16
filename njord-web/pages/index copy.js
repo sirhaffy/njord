@@ -24,7 +24,9 @@ export default function Home( {posts} ) {
             posts.nodes.map( post => {
               return (
                 <ul key="{post.slug}">
-                  <Link href={`/posts/${post.slug}`}>{post.title}</Link>
+                  <li>
+                    <Link href={`/posts/${post.slug}`}>{post.title}</Link>
+                  </li>
                 </ul>
               )
             })
@@ -42,7 +44,7 @@ export default function Home( {posts} ) {
 // Run out query inside here.
 export async function getStaticProps() {
 
-  const res = await fetch( 'http://localhost:8888/njord/njord-cms/graphql', {
+  const res = await fetch( process.env.WORDPRESS_LOCAL_API_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ 

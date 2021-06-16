@@ -1,29 +1,21 @@
 import { ApolloClient, InMemoryCache, createHttpLink, gql } from '@apollo/client'
 import Link from 'next/link'
+import Image from 'next/image'
+
 
 export default function Post( {data} ) {
+  
+  console.log({data});
 
-  // console.log({data});
-
-  // FLYTTA TILL INDEX OCH GÖR OM TILL SINGLE-POST.
+  const post = data.post;
 
   return (
     <div>
-      <ul>  
-      
-        {
-          data.posts.nodes.map( post => {
-            return (
-              <ul>
-                <li>
-                  <Link href={`/posts/${post.slug}`}>{post.title}</Link>
-                </li>
-              </ul>
-            )
-          })
-        }
-
-      </ul>
+      <h1 className="text-3xl text-center">{post.title}</h1>
+      <div className="flex justify-center">
+        <Image width="640" height="480" src={post.featuredImage.node.sourceUrl} />
+      </div>
+      <article className="text-center" dangerouslySetInnerHTML={{__html: post.content}}></article>
     </div>
   )
   
@@ -39,29 +31,27 @@ const client = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
-const SsgApollo = ({ data }) => {
-  //data will be rendered here 
-}
-
-export async function getServerSideProps() {
+export async function getServerSideProps( context ) {
 
   const { data } = await client.query({
     query: gql`
-      query AllPosts {
-        posts {
-          nodes {
-            slug
-            title
-            content
-            featuredImage {
-              node {
-                sourceUrl
-              }
+      query SinglePost( $id: ID!, $idType: PostIdType! ) {
+        post(id: $id, idType: $idType) {
+          title
+          slug
+          content
+          featuredImage {
+            node {
+              sourceUrl
             }
           }
         }
       }
     `,
+    variables: {
+      id: context.params.slug,
+      idType: 'SLUG'
+    }
   });
 
   if (!data) {

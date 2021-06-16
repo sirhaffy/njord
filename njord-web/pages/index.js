@@ -1,8 +1,9 @@
 import Head from 'next/head'
 import Link from 'next/link'
+import { ApolloClient, InMemoryCache, createHttpLink, gql } from '@apollo/client'
 
-export default function Home( {posts} ) {
-  console.log({posts})
+export default function Home( {data} ) {
+  // console.log({data});
 
   return (
     <div>
@@ -21,11 +22,11 @@ export default function Home( {posts} ) {
 
         <p className="text-center pt-5 pb-8">
           {
-            posts.nodes.map( post => {
+            data.posts.nodes.map( post => {
               return (
                 <ul key="{post.slug}">
                   <li>
-                    <Link href={`/posts/${post.slug}`}>{post.title}</Link>
+                   <Link href={`/posts/${post.slug}`}>{post.title}</Link> {/* <---- TROR FELET ÄR HÄR  */}
                   </li>
                 </ul>
               )
@@ -42,32 +43,39 @@ export default function Home( {posts} ) {
 }
 
 // Run out query inside here.
-export async function getStaticProps() {
+const client = new ApolloClient({
+  ssrMode: true,
+  link: createHttpLink({
+    uri: process.env.WORDPRESS_LOCAL_SITE_URL,
+    credentials: 'same-origin'
+  }),
+  cache: new InMemoryCache(),
+});
 
-  const res = await fetch( process.env.WORDPRESS_LOCAL_API_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ 
-      query: `
-        query Posts {
-          posts {
-            nodes {
-              slug
-              title
+export async function getServerSideProps() {
+
+  const { data } = await client.query({
+    query: gql`
+      query AllPosts {
+        posts {
+          nodes {
+            slug
+            title
+            content
+            featuredImage {
+              node {
+                sourceUrl
+              }
             }
           }
         }
-      `,
-    })
-  })
+      }
+    `,
+  });
 
-  const json = await res.json()
-
-  return {
-    props: {
-      posts: json.data.posts,
-    },
+  if (!data) {
+    return { notFound: true };
   }
-
+  return { props: { data } };
 }
 
