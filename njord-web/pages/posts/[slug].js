@@ -1,6 +1,7 @@
 import { ApolloClient, InMemoryCache, createHttpLink, gql } from '@apollo/client'
 import Link from 'next/link'
 import Image from 'next/image'
+import client from '../../src/Controller/apollo/client';
 
 
 export default function Post( {data} ) {
@@ -20,16 +21,6 @@ export default function Post( {data} ) {
   )
   
 }
-
-
-const client = new ApolloClient({
-  ssrMode: true,
-  link: createHttpLink({
-    uri: process.env.WORDPRESS_LOCAL_SITE_URL,
-    credentials: 'same-origin'
-  }),
-  cache: new InMemoryCache(),
-});
 
 export async function getServerSideProps( context ) {
 

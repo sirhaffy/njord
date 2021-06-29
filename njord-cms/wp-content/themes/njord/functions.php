@@ -47,6 +47,17 @@
   }
   add_filter('upload_mimes', 'cc_mime_types');
 
+
+  /**
+  * Menu
+  */
+
+  register_nav_menus( 
+    array(
+      'primary' => __( 'Primary Menu' )
+    ) 
+  );
+
   /**
   * API
   */

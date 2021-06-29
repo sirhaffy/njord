@@ -1,16 +1,16 @@
 import Head from 'next/head'
 import Link from 'next/link'
 import { ApolloClient, InMemoryCache, createHttpLink, gql } from '@apollo/client'
+import Header from './header';
 
 export default function Home( {data} ) {
   // console.log({data});
 
   return (
     <div>
-      <Head>
-        <title>NJORD</title>
-      </Head>
 
+      <Header></Header>
+    
       <main className="container bg-gray-200 mt-5 max-w-md mx-auto rounded-lg p-5">
         <h1 className="text-5xl text-center pt-3">
           NJORD
@@ -20,19 +20,17 @@ export default function Home( {data} ) {
           Print some data from WP:
         </p>
 
-        <p className="text-center pt-5 pb-8">
           {
             data.posts.nodes.map( post => {
               return (
-                <ul key="{post.slug}">
-                  <li>
-                   <Link href={`/posts/${post.slug}`}>{post.title}</Link> {/* <---- TROR FELET ÄR HÄR  */}
+                <ul key={post.slug}>
+                  <li className="text-center">
+                   <Link href={`/posts/${post.slug}`}>{post.title}</Link>
                   </li>
                 </ul>
               )
             })
           }
-        </p>
       </main>
         
 
@@ -56,17 +54,11 @@ export async function getServerSideProps() {
 
   const { data } = await client.query({
     query: gql`
-      query AllPosts {
+      query Posts {
         posts {
           nodes {
             slug
             title
-            content
-            featuredImage {
-              node {
-                sourceUrl
-              }
-            }
           }
         }
       }
